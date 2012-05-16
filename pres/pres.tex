@@ -1,0 +1,396 @@
+\documentclass[handout]{beamer}
+
+
+\usetheme{Warsaw}
+\beamertemplatenavigationsymbolsempty
+\AtBeginSubsection[]
+{
+ \begin{frame}{Table of Contents}
+  \tableofcontents[currentsection,currentsubsection]
+ \end{frame}
+}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{amsmath}
+
+
+\lstset{basicstyle=\footnotesize}
+
+
+\title{Introduction à la programmation fonctionnelle}
+\subtitle{map n00b2pgm audience}
+\institute{Nantes Functional Programming Group}
+\date{14 mai 2012}
+
+
+\begin{document}
+ \frame{\titlepage}
+
+
+
+
+
+ \section{La pensée fonctionnelle}
+ \subsection{Le clash des visions}
+  \begin{frame}
+   La programmation fonctionnelle quand on vient de l'impératif, c'est avant
+   tout un autre paradigme.
+   \begin{block}{paradigme @Wikipédia}
+   Un paradigme est une représentation du monde, une manière de voir les choses.
+   \end{block}
+  \end{frame}
+
+
+  \begin{frame}{Le paradigme impératif}
+   On dicte à l'ordinateur des modifications à exécuter sur l'état du
+   programme :
+   \pause
+   \begin{itemize}[<+->]
+    \item on déclare des variables (allocation de mémoire)
+    \item on les transforme (modification de la mémoire allouée)
+    \item on les détruit (désallocation de mémoire)
+   \end{itemize}
+  \end{frame}
+
+
+  \begin{frame}{Le paradigme fonctionnel}
+   On abstrait une partie de l'implémentation pour se concentrer sur les
+   données : on déclare la relation qui existe entre les données que l'on reçoit
+   et celles que l'on recherche
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Intuition de la différence entre les deux}
+   Au lieu de dire comment on fait les choses, on dit simplement que les choses
+   doivent être faites. Le reste relève du talent des codeurs de GHC (ou
+   équivalent pour les autres langages :)).
+   
+   \pause
+   
+   Par exemple, pour calculer la somme des nombres allant de 1 à n, en C à
+   gauche et en Haskell à droite, on dirait :
+   \begin{columns}[t] % the "c" option specifies center vertical alignment
+    \column{.5\textwidth} % column designated by a command
+     \begin{lstlisting}[language=C]
+int f(int n) {
+  int result = 0, i = 1;
+  for(; i <= n; i++)
+    result += i;
+  return result;
+}
+     \end{lstlisting}
+    \column{.5\textwidth}
+     \begin{lstlisting}[language=Haskell]
+f :: Integer -> Integer
+f n = sum [1..n]
+     \end{lstlisting}
+   \end{columns}
+\end{frame}
+
+
+
+
+
+ \section{Les concepts clefs}
+ \subsection{Les fonctions}
+  \begin{frame}{Dégrossir le concept de fonction}
+   Une fonction est une boîte noire qui transforme un objet en un autre
+   objet.
+  \end{frame}
+
+
+  \begin{frame}{Un peu de formalisme}
+   Une fonction se caractérise par :
+   \pause
+   \begin{itemize}[<+->]
+    \item son domaine : l'ensemble duquel est issu son argument
+    \item son codomaine : l'ensemble auquel appartient le résultat
+    \item la manière dont elle transforme l'argument en le résultat
+   \end{itemize}
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Les fonctions : exemple avec la fonction carré}
+   \begin{block}{En français}
+    \begin{itemize}
+     \item son argument est un entier naturel
+     \item son résultat est un entier naturel
+     \item elle retourne son argument au carré
+    \end{itemize}
+   \end{block}
+   \pause
+   \begin{block}{En maths}
+    \begin{tabular}{l l l l}
+     \texttt{carré :} & $\mathbb{N}$ & $\rightarrow$ & $\mathbb{N}$ \\
+                      & $x$          & $\mapsto$     & $x^2$ \\
+    \end{tabular}
+   \end{block}
+   \pause
+   \begin{block}{En Haskell}
+    \begin{lstlisting}[language=Haskell]
+square :: Integer -> Integer
+square n = n ^ 2
+    \end{lstlisting}
+   \end{block}
+\end{frame}
+
+
+  \begin{frame}{En quoi sont-elles un concept clef}
+   Pour décrire les données que l'on souhaite obtenir à partir des données de
+   départ dans un programme, on exprime des transformations.
+   
+   Les fonctions sont la manière la plus simple de les spécifier.
+  \end{frame}
+
+
+  \begin{frame}{Ce qu'est un programme fonctionnel}
+   On pourrait voir un programme fonctionnel comme un enchaînement d'appels de
+   fonctions sur les données de départ :
+   
+   \[
+    d_i \overset{f}   {\longrightarrow}
+    d_1 \overset{g}   {\longrightarrow}
+    d_2 \overset{h} {\longrightarrow}
+    d_f
+   \]
+  \end{frame}
+
+
+  \begin{frame}{La composition}
+   Composer deux fonctions, c'est les "fusionner" pour obtenir la fonction
+   qui se définit par l'application des deux fonctions d'origine.
+   \pause
+   \begin{block}{En version matheuse}
+    \begin{tabular}{l l l l l l l l l l}
+     si & $f :$ & $B$ & $\rightarrow$ & $C$ &
+     et & $g :$ & $A$ & $\rightarrow$ & $B$ \\
+        &       & $b$ & $\mapsto$     & $c$ &
+        &       & $a$ & $\mapsto$     & $b'$ \\
+    \end{tabular} \newline \newline
+    \begin{tabular}{l l l l l}
+     alors & $f \circ g :$ & $A$ & $\rightarrow$ & $C$ \\
+           &               & $a$ & $\mapsto$     & $f(g(a))$ \\
+    \end{tabular}
+   \end{block}
+  \end{frame}
+
+
+  \begin{frame}{Ce qu'est un programme fonctionnel bis}
+   On peut reprendre la vision proposée d'un programme fonctionnel :
+   
+   \[
+    d_i \overset{f}   {\longrightarrow}
+    d_1 \overset{g}   {\longrightarrow}
+    d_2 \overset{h} {\longrightarrow}
+    d_f
+   \]
+   Et en proposer une autre, cette fois en utilisant la composition de
+   fonctions :
+    \[
+    d_i \overset{h \circ g \circ f}   {\longrightarrow} d_f
+   \]
+   \pause
+   Modularité : si on a $g = g'$, alors, 
+   le programme suivant est équivalent au programme ci-dessus :
+    \[
+    d_i \overset{h \circ g' \circ f}   {\longrightarrow} d_f
+   \]
+  \end{frame}
+
+
+
+
+
+ \subsection{La transparence référentielle}
+  \begin{frame}{Ce qu'est la transparence référentielle}
+   La transparence référentielle, c'est le fait de pouvoir interchanger l'appel
+   d'une fonction et son résultat indifférement.
+  \end{frame}
+
+
+  \begin{frame}{Pourquoi seulement en fonctionnel ?}
+   \begin{itemize}
+    \item nécessité qu'une fonction retourne toujours le même résultat pour un
+    argument donné
+    \item nécessité qu'une fonction n'ait pas d'effets de bord
+   \end{itemize}
+   \pause
+   Ces deux points ne sont souvent pas respectés en impératif. De fait, les
+   fonctions impératives sont plus des procédures.
+  \end{frame}
+
+
+  \begin{frame}{Ce que ça implique}
+   \begin{itemize}[<+->]
+    \item plus facile de raisonner sur le comportement d'une fonction
+    \item optimisations à l'exécution (mémoization, cache, parallélisation)
+    \item testabilité garantie
+   \end{itemize}
+  \end{frame}
+
+
+
+
+
+ \subsection{L'évaluation paresseuse}
+  \begin{frame}{Ce qu'est l'évaluation paresseuse}
+   On évalue un bloc que lorsque l'on en a besoin (donc potentiellement jamais).
+  \end{frame}
+
+
+  \begin{frame}{Ce que ça implique}
+   \begin{itemize}
+    \item un langage paresseux peut manipuler des structures de données infinies
+    \item un language paresseux est \textbf{non strict}. L'appel d'une
+          fonction avec un argument non défini n'est pas forcément non défini.
+   \end{itemize}
+  \end{frame}
+
+
+
+
+
+ \subsection{La récursion}
+  \begin{frame}{Ce qu'est la récursion}
+   La récursion est le fait pour une fonction de s'appeller soi-même
+   (directement ou indirectement).
+   
+   La définition par récurrence est quant à elle le fait de définir la valeur
+   d'un élément d'une suite en fonction de la valeur de l'élément qui le
+   précède. Il suffit ensuite de connaître la valeur d'un élément pour obtenir
+   la valeur de tous ses successeurs.
+  \end{frame}
+
+
+  \begin{frame}{Intuition sur la récursion}
+   Pour savoir monter à n'importe quel barreau d'une échelle, il suffit de :
+   \pause
+   \begin{itemize}
+    \item savoir monter sur le premier barreau
+    \item savoir monter d'un barreau au barreau suivant
+   \end{itemize}
+   \pause
+   La définition par récurrence est analogue : avec une \emph{initialisation}
+   et une \emph{propriété d'hérédité}, on définit toute une suite.
+  \end{frame}
+
+
+  \begin{frame}{Exemples}
+   \begin{block}{La suite des nombres pairs $(P_n)$}
+    \[
+     \begin{cases}
+      P_0 = 0\\
+      \forall n \geq 0, \quad P_{n+1} = P_n + 2
+     \end{cases}
+    \]
+   \end{block}
+   \pause
+   \begin{block}{La suite des nombres de Fibonacci $(F_n)$}
+    \[
+     \begin{cases}
+      F_0 = 0\\
+      F_1 = 1\\
+      \forall n \geq 0, \quad F_{n+2} = F_{n+1} + F_n
+     \end{cases}
+    \]
+   \end{block}
+  \end{frame}
+
+
+  \begin{frame}{Exemples - suite}
+   On peut s'amuser avec des exemples un petit peu plus tordus -- ici on définit
+   deux suites en même temps :
+   \begin{block}{Les suites des nombres pairs $(P_n)$ et impairs $(I_n)$}
+    \[
+     \begin{array}{c c}
+      \begin{cases}
+       P_0 = 0\\
+       \forall n \geq 0, \quad P_{n+1} = I_n + 1
+      \end{cases}
+      &
+      \forall n \geq 0, \quad I_n = P_n + 1
+      \\
+     \end{array}
+    \]
+   \end{block}
+  \end{frame}
+
+
+
+
+
+ \subsection{La co-récursion}
+  \begin{frame}{Ce qu'est la co-récursion}
+   La co-récursion, on peut dire pour simplifier que c'est la récursion sur
+   le résultat (le co-domaine) plutôt que l'argument (le domaine).
+   \begin{block}{Rappel sur la récursion}
+    Quand on utilise une définition par récurrence, le but est de successivement
+    s'appeller avec des arguments "plus petits" jusqu'à atteindre un cas de
+    base.
+   \end{block}
+   \begin{block}{La co-récursion}
+    Quand on utilise une définition par co-récurrence, le but est de construire
+    le résultat en s'appellant successivement avec des arguments "plus grands".
+    Il peut y avoir ou non un cas d'arrêt (souvent il n'y en a pas).
+   \end{block}
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Exemples}
+   \begin{block}{Rappel de récursion}
+     \begin{lstlisting}[language=Haskell]
+pair :: Integer -> Integer
+pair 0 = 0
+pair x = pair (x - 1) + 2
+     \end{lstlisting}
+   \end{block}
+   \pause
+   \begin{block}{Co-récursion}
+     \begin{lstlisting}[language=Haskell]
+pairs :: [Integer]
+pairs = 0 : map (+ 2) pairs
+     \end{lstlisting}
+   \end{block}
+\end{frame}
+
+
+  \begin{frame}[fragile]{On peut être les deux...}
+   \begin{block}{Comme map...}
+     \begin{lstlisting}[language=Haskell]
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+     \end{lstlisting}
+   \end{block}
+   \pause
+   \begin{block}{... ou zipWith}
+     \begin{lstlisting}[language=Haskell]
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith f (a:as) (b:bs) = f a b : zipWith f as bs
+zipWith _ _      _      = []
+     \end{lstlisting}
+   \end{block}
+\end{frame}
+
+
+  \begin{frame}[fragile]{Utilité}
+   La co-récursion est extrêmement utile pour spécifier les listes infinies
+   (qu'on appelle aussi streams). Quelques exemples canoniques sont:
+   
+   \begin{block}{Les nombres de Fibonacci}
+     \begin{lstlisting}[language=Haskell]
+fibs :: [Integer]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+     \end{lstlisting}
+   \end{block}
+   \pause
+   \begin{block}{Les factorielles}
+     \begin{lstlisting}[language=Haskell]
+factorials = [Integer]
+factorials = 1 : zipWith (*) [1..] factorials
+     \end{lstlisting}
+   \end{block}
+\end{frame}
+\end{document}
