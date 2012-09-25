@@ -57,6 +57,24 @@ Réalisé à l'aide d'implicits
         ev.baz(l)
     }
 
+# En Ocaml
+
+    module type MyModule = sig
+     val foo : 'a -> 'a
+     val bar : 'a -> bool
+     val baz : 'a -> bool
+    end;;
+
+
+    module MyModuleInt(A : MyModule) = struct include A
+     let foo i= (i+2)
+     let bar i = (i=0)
+     let baz  i = bar(foo i)
+    end;;
+ 
+
+
+
 #Exemples de typeclass
 
     class Eq a where
