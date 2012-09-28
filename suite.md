@@ -43,13 +43,13 @@ Réalisé à l'aide d'implicits
 
     // Implémentation
     implicit object IntMyClass extends MyClass[Int] {
-        foo(l: Int) = l + 2
-        bar(l: Int) = (l == 0)
+        def foo(l: Int) = l + 2
+        def bar(l: Int) = (l == 0)
     }
 
     // Utilisation
     def foobar[A: MyClass](l: A) = {
-        baz(l)
+        implicitly[MyClass[A]].baz(l)
     }
 
     // Ou
